@@ -1,0 +1,63 @@
+{{!--
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │  CAASPA – Units / Inventory Result Type Template                            │
+  │  ─────────────────────────────────────────────────────────────────────────  │
+  │  Apply as a "Result Type" in the PnP Search Results web part.               │
+  │  Condition: ContentTypeId begins with 0x0100 (or filter on list name).      │
+  │                                                                             │
+  │  Required managed properties (mapped from SharePoint list columns):         │
+  │    UnitId, Registration, VIN, Make, Model, Variant, Year, Mileage,          │
+  │    Colour, FuelType, Transmission, EngineSize, Condition, Status,           │
+  │    Price, Currency, Valuation, ImageUrl, Path,                              │
+  │    PartsCatalogueUrl, ServiceHistoryUrl, SpecificationUrl, FinanceUrl,      │
+  │    Owner, Location, MOTExpiry, TaxExpiry, NextServiceDue                    │
+  └─────────────────────────────────────────────────────────────────────────────┘
+--}}
+
+<style>
+  .caaspa-unit-wrapper {
+    margin: 4px 0;
+  }
+  .caaspa-unit-wrapper caaspa-unit-card {
+    display: block;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    border-radius: 8px;
+  }
+  .caaspa-unit-wrapper:hover caaspa-unit-card {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.14) !important;
+  }
+</style>
+
+<div class="caaspa-unit-wrapper">
+  <caaspa-unit-card
+    data-unit-id="{{item.UnitId}}"
+    data-registration="{{item.Registration}}"
+    data-vin="{{item.VIN}}"
+    data-make="{{item.Make}}"
+    data-model="{{item.Model}}"
+    data-variant="{{item.Variant}}"
+    data-year="{{item.Year}}"
+    data-mileage="{{item.Mileage}}"
+    data-colour="{{item.Colour}}"
+    data-fuel-type="{{item.FuelType}}"
+    data-transmission="{{item.Transmission}}"
+    data-engine-size="{{item.EngineSize}}"
+    data-condition="{{#if item.Condition}}{{item.Condition}}{{else}}Used{{/if}}"
+    data-status="{{#if item.Status}}{{item.Status}}{{else}}Available{{/if}}"
+    data-price="{{item.Price}}"
+    data-currency="{{#if item.Currency}}{{item.Currency}}{{else}}GBP{{/if}}"
+    data-valuation="{{item.Valuation}}"
+    data-image-url="{{item.ImageUrl}}"
+    data-unit-url="{{slot item @root.slots.PreviewUrl}}"
+    data-parts-catalogue-url="{{item.PartsCatalogueUrl}}"
+    data-service-history-url="{{item.ServiceHistoryUrl}}"
+    data-specification-url="{{item.SpecificationUrl}}"
+    data-finance-url="{{item.FinanceUrl}}"
+    data-owner="{{item.Owner}}"
+    data-location="{{item.Location}}"
+    data-mot-expiry="{{item.MOTExpiry}}"
+    data-tax-expiry="{{item.TaxExpiry}}"
+    data-next-service-due="{{item.NextServiceDue}}">
+  </caaspa-unit-card>
+</div>

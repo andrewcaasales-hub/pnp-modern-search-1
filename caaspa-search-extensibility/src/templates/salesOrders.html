@@ -1,0 +1,45 @@
+{{!--
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │  CAASPA – Sales Orders Result Type Template                                 │
+  │  ─────────────────────────────────────────────────────────────────────────  │
+  │  Apply as a "Result Type" in the PnP Search Results web part.               │
+  │  Condition: ContentTypeId begins with 0x0100 (or filter on list name).      │
+  │                                                                             │
+  │  Required managed properties (mapped from SharePoint list columns):         │
+  │    OrderNumber, CustomerName, CustomerReference, OrderDate, RequiredDate,   │
+  │    TotalValue, Currency, Status, SalesRep, Description, Path                │
+  └─────────────────────────────────────────────────────────────────────────────┘
+--}}
+
+<style>
+  .caaspa-so-wrapper {
+    margin: 4px 0;
+  }
+  /* Hover-lift animation */
+  .caaspa-so-wrapper caaspa-salesorder-hovercard {
+    display: block;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    border-radius: 8px;
+  }
+  .caaspa-so-wrapper:hover caaspa-salesorder-hovercard {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.14) !important;
+  }
+</style>
+
+<div class="caaspa-so-wrapper">
+  <caaspa-salesorder-hovercard
+    data-order-number="{{slot item @root.slots.Title}}"
+    data-customer-name="{{item.CustomerName}}"
+    data-customer-reference="{{item.CustomerReference}}"
+    data-order-date="{{item.OrderDate}}"
+    data-required-date="{{item.RequiredDate}}"
+    data-total-value="{{item.TotalValue}}"
+    data-currency="{{#if item.Currency}}{{item.Currency}}{{else}}GBP{{/if}}"
+    data-status="{{item.Status}}"
+    data-sales-rep="{{item.SalesRep}}"
+    data-description="{{item.Description}}"
+    data-order-url="{{slot item @root.slots.PreviewUrl}}"
+    data-compact="false">
+  </caaspa-salesorder-hovercard>
+</div>

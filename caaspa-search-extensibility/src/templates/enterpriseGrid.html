@@ -1,0 +1,276 @@
+{{!--
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │  CAASPA – Enterprise Search Results Grid Layout                             │
+  │  ─────────────────────────────────────────────────────────────────────────  │
+  │  Use this as the "Custom" layout template in the Search Results web part.   │
+  │  It renders all result types (Sales Orders / Units / default documents)     │
+  │  in a responsive card grid with enterprise styling.                         │
+  └─────────────────────────────────────────────────────────────────────────────┘
+--}}
+
+<content id="data-content">
+
+<style>
+  /* ── CAASPA Enterprise Grid ──────────────────────────────────────────── */
+  .caaspa-grid {
+    --col-min: 320px;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* results header bar */
+  .caaspa-grid__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 12px 0;
+    border-bottom: 2px solid #EDEBE9;
+    margin-bottom: 16px;
+  }
+  .caaspa-grid__count {
+    font-size: 13px;
+    color: #605E5C;
+  }
+  .caaspa-grid__count strong {
+    color: #323130;
+  }
+
+  /* filter chips row */
+  .caaspa-grid__filters {
+    margin-bottom: 12px;
+  }
+
+  /* the cards container */
+  .caaspa-grid__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--col-min), 1fr));
+    gap: 16px;
+  }
+
+  /* ── Sales Order card shell ─────────────────────────────────────────── */
+  .caaspa-so-card {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+  }
+  .caaspa-so-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  }
+  .caaspa-so-card caaspa-salesorder-hovercard {
+    display: block;
+  }
+
+  /* ── Unit card shell ─────────────────────────────────────────────────── */
+  .caaspa-unit-card {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+  }
+  .caaspa-unit-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  }
+  .caaspa-unit-card caaspa-unit-card {
+    display: block;
+  }
+
+  /* ── Default document card fallback ─────────────────────────────────── */
+  .caaspa-doc-card {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .caaspa-doc-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  }
+
+  /* ── Empty state ─────────────────────────────────────────────────────── */
+  .caaspa-grid__empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #605E5C;
+    text-align: center;
+  }
+  .caaspa-grid__empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.4;
+  }
+  .caaspa-grid__empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #323130;
+    margin-bottom: 6px;
+  }
+  .caaspa-grid__empty-sub {
+    font-size: 13px;
+  }
+</style>
+
+<div class="caaspa-grid">
+
+  {{! ── selected filters ── }}
+  {{#if @root.properties.showSelectedFilters}}
+    <div class="caaspa-grid__filters">
+      <pnp-selectedfilters
+        data-filters="{{JSONstringify filters.selectedFilters 2}}"
+        data-filters-configuration="{{JSONstringify filters.filtersConfiguration 2}}"
+        data-instance-id="{{filters.instanceId}}"
+        data-operator="{{filters.filterOperator}}"
+        data-theme-variant="{{JSONstringify @root.theme}}">
+      </pnp-selectedfilters>
+    </div>
+  {{/if}}
+
+  {{! ── header ── }}
+  <div class="caaspa-grid__header">
+    <span class="caaspa-grid__count">
+      {{#if @root.properties.showResultsCount}}
+        Showing <strong>{{@root.data.totalItemsCount}}</strong>
+        {{#if @root.inputQueryText}}
+          results for <strong>"{{@root.inputQueryText}}"</strong>
+        {{else}}
+          results
+        {{/if}}
+      {{/if}}
+    </span>
+    <pnp-sortfield
+      data-fields="{{JSONstringify @root.properties.dataSourceProperties.sortList}}"
+      data-default-selected-field="{{sort.selectedSortFieldName}}"
+      data-default-direction="{{sort.selectedSortDirection}}"
+      data-theme-variant="{{JSONstringify @root.theme}}">
+    </pnp-sortfield>
+  </div>
+
+  {{! ── cards grid ── }}
+  <div class="caaspa-grid__cards">
+
+    {{#if data.items}}
+      {{#each data.items as |item|}}
+
+        {{!-- Sales Order –– detected by Status field containing order stage values --}}
+        {{#if item.OrderNumber}}
+          <div class="caaspa-so-card">
+            <caaspa-salesorder-hovercard
+              data-order-number="{{item.OrderNumber}}"
+              data-customer-name="{{item.CustomerName}}"
+              data-customer-reference="{{item.CustomerReference}}"
+              data-order-date="{{item.OrderDate}}"
+              data-required-date="{{item.RequiredDate}}"
+              data-total-value="{{item.TotalValue}}"
+              data-currency="{{#if item.Currency}}{{item.Currency}}{{else}}GBP{{/if}}"
+              data-status="{{#if item.Status}}{{item.Status}}{{else}}Request{{/if}}"
+              data-sales-rep="{{item.SalesRep}}"
+              data-description="{{item.Description}}"
+              data-order-url="{{item.Path}}"
+              data-compact="false">
+            </caaspa-salesorder-hovercard>
+          </div>
+
+        {{!-- Unit / Vehicle –– detected by Make+Model fields --}}
+        {{else if item.Make}}
+          <div class="caaspa-unit-card">
+            <caaspa-unit-card
+              data-unit-id="{{item.UnitId}}"
+              data-registration="{{item.Registration}}"
+              data-vin="{{item.VIN}}"
+              data-make="{{item.Make}}"
+              data-model="{{item.Model}}"
+              data-variant="{{item.Variant}}"
+              data-year="{{item.Year}}"
+              data-mileage="{{item.Mileage}}"
+              data-colour="{{item.Colour}}"
+              data-fuel-type="{{item.FuelType}}"
+              data-transmission="{{item.Transmission}}"
+              data-engine-size="{{item.EngineSize}}"
+              data-condition="{{#if item.Condition}}{{item.Condition}}{{else}}Used{{/if}}"
+              data-status="{{#if item.UnitStatus}}{{item.UnitStatus}}{{else}}Available{{/if}}"
+              data-price="{{item.Price}}"
+              data-currency="{{#if item.Currency}}{{item.Currency}}{{else}}GBP{{/if}}"
+              data-valuation="{{item.Valuation}}"
+              data-image-url="{{item.ImageUrl}}"
+              data-unit-url="{{item.Path}}"
+              data-parts-catalogue-url="{{item.PartsCatalogueUrl}}"
+              data-service-history-url="{{item.ServiceHistoryUrl}}"
+              data-specification-url="{{item.SpecificationUrl}}"
+              data-finance-url="{{item.FinanceUrl}}"
+              data-owner="{{item.Owner}}"
+              data-location="{{item.Location}}"
+              data-mot-expiry="{{item.MOTExpiry}}"
+              data-tax-expiry="{{item.TaxExpiry}}"
+              data-next-service-due="{{item.NextServiceDue}}">
+            </caaspa-unit-card>
+          </div>
+
+        {{!-- Default document card fallback --}}
+        {{else}}
+          <div class="caaspa-doc-card">
+            <pnp-documentcard
+              data-item="{{JSONstringify item}}"
+              data-fields-configuration="{{JSONstringify @root.properties.layoutProperties.documentCardFields}}"
+              data-enable-preview="{{@root.properties.layoutProperties.enablePreview}}"
+              data-show-file-icon="{{@root.properties.layoutProperties.showFileIcon}}"
+              data-is-compact="false"
+              data-context="{{JSONstringify (truncateContext @root)}}"
+              data-instance-id="{{@root.instanceId}}"
+              data-theme-variant="{{JSONstringify @root.theme}}"
+              data-allow-item-selection="{{@root.properties.itemSelectionProps.allowItemSelection}}"
+              data-item-key="{{@root.paging.currentPageNumber}}{{@index}}"
+              data-selected-keys="{{JSONstringify @root.selectedKeys}}"
+              data-index="{{@index}}">
+            </pnp-documentcard>
+          </div>
+        {{/if}}
+
+      {{/each}}
+
+    {{else}}
+      {{! ── empty state ── }}
+      <div class="caaspa-grid__empty">
+        <div class="caaspa-grid__empty-icon">🔍</div>
+        <div class="caaspa-grid__empty-title">No results found</div>
+        <div class="caaspa-grid__empty-sub">
+          Try adjusting your search terms or filters
+        </div>
+      </div>
+    {{/if}}
+
+  </div>
+
+  {{! ── pagination ── }}
+  {{#if @root.properties.paging.showPaging}}
+    {{#gt @root.data.totalItemsCount @root.properties.paging.itemsCountPerPage}}
+      <pnp-pagination
+        data-total-items="{{@root.data.totalItemsCount}}"
+        data-hide-first-last-pages="{{@root.properties.paging.hideFirstLastPages}}"
+        data-hide-disabled="{{@root.properties.paging.hideDisabled}}"
+        data-hide-navigation="{{@root.properties.paging.hideNavigation}}"
+        data-range="{{@root.properties.paging.pagingRange}}"
+        data-items-count-per-page="{{@root.properties.paging.itemsCountPerPage}}"
+        data-current-page-number="{{@root.paging.currentPageNumber}}"
+        data-theme-variant="{{JSONstringify @root.theme}}">
+      </pnp-pagination>
+    {{/gt}}
+  {{/if}}
+
+</div>
+
+</content>
+
+<content id="placeholder-content">
+  <div style="padding:40px;text-align:center;color:#605E5C;font-family:'Segoe UI',sans-serif">
+    <div style="font-size:32px;margin-bottom:12px;opacity:0.3">🏢</div>
+    <div style="font-size:14px;font-weight:600">CAASPA Search</div>
+    <div style="font-size:12px;margin-top:4px">Configure the web part to begin searching</div>
+  </div>
+</content>

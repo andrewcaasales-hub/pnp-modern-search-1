@@ -1,0 +1,26 @@
+{
+  "name": "caaspa-search-extensibility",
+  "version": "1.0.0",
+  "description": "CAASPA enterprise search extensibility library for PnP Modern Search - Sales Orders & Units",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -p tsconfig.json --watch",
+    "clean": "rimraf lib"
+  },
+  "peerDependencies": {
+    "@fluentui/react-components": "^9.61.0",
+    "@microsoft/sp-component-base": "^1.20.0",
+    "@microsoft/sp-core-library": "^1.20.0",
+    "@pnp/modern-search-extensibility": "^1.22.0",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "17.0.45",
+    "@types/react-dom": "17.0.17",
+    "typescript": "5.8.3",
+    "rimraf": "^5.0.0"
+  }
+}
