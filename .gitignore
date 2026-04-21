@@ -1,4 +1,20 @@
 site/*
 
+# Dependencies
+node_modules/
+*/node_modules/
+
 # Mac files
 .DS_Store
+
+# Build outputs
+dist/
+lib/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
